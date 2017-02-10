@@ -1,0 +1,80 @@
+#!/bin/bash
+
+BANNER_ROOT={{ banner_root }}
+BANNER_HOME={{ banner_home }}
+EXE_HOME={{ banner_exe_home }}
+
+BANNER_LINKS={{ banner_links }}
+BANNER_ADMIN={{ banner_admin }}
+
+JOBSUB_HOME={{ banner_jobsub_home }}
+
+ORACLE_LPPROG="lpr"
+ORACLE_LPARGS="-Plp"
+ORACLE_PATH=.:${HOME}:${BANNER_LINKS}:${BANNER_ADMIN}
+SQLPATH=${ORACLE_PATH}
+
+case $PATH in
+     *${EXE_HOME}*) ;;
+     *:) PATH=${PATH}${EXE_HOME} ;;
+     "") PATH=${EXE_HOME} ;;
+     *)  PATH=${PATH}:${EXE_HOME} ;;
+esac
+
+case $PATH in
+     *${BANNER_ADMIN}*) ;;
+     *:) PATH=${PATH}${BANNER_ADMIN} ;;
+     "") PATH=${BANNER_ADMIN} ;;
+     *)  PATH=${PATH}:${BANNER_ADMIN} ;;
+esac
+
+case $PATH in
+     *${BANNER_LINKS}*) ;;
+     *:) PATH=${PATH}${BANNER_LINKS} ;;
+     "") PATH=${BANNER_LINKS} ;;
+     *)  PATH=${PATH}:${BANNER_LINKS} ;;
+esac
+
+case $LD_LIBRARY_PATH in
+    *${EXE_HOME}*) ;;
+    *:) LD_LIBRARY_PATH=${LD_LIBRARY_PATH}${EXE_HOME} ;;
+    "") LD_LIBRARY_PATH=${EXE_HOME} ;;
+    *) LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${EXE_HOME} ;;
+esac
+
+LOCAL_LIB=/usr/local/lib
+
+case $LD_LIBRARY_PATH in
+  *${LOCAL_LIB}*) ;;
+  *:) LD_LIBRARY_PATH=${LD_LIBRARY_PATH}${LOCAL_LIB} ;;
+  "") LD_LIBRARY_PATH=${LOCAL_LIB} ;;
+  *)  LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${LOCAL_LIB} ;;
+esac
+
+BASE_LIB=/lib
+
+case $LD_LIBRARY_PATH in
+  *:${BASE_LIB}:*) ;;
+  *:${BASE_LIB}) ;;
+  *:) LD_LIBRARY_PATH=${LD_LIBRARY_PATH}${BASE_LIB} ;;
+  "") LD_LIBRARY_PATH=${LOCAL_LIB} ;;
+  *)  LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BASE_LIB} ;;
+esac
+
+export BANNER_ROOT
+export BANNER_HOME
+export EXE_HOME
+export BANNER_LINKS
+export BANNER_ADMIN
+export JOBSUB_HOME
+
+export ORACLE_LPPROG
+export ORACLE_LPARGS
+export ORACLE_PATH
+export SQLPATH
+
+export PATH
+export LD_LIBRARY_PATH
+
+SRCE_LINK=?SRCE_LINK?
+export SRCE_LINK

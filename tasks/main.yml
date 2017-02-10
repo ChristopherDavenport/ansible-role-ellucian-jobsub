@@ -1,0 +1,103 @@
+---
+
+- name: Create the banner group
+  become: yes
+  group:
+    state: present
+    name: "{{ banner_group }}"
+
+- name: Add banner user
+  become: yes
+  user:
+    append: yes
+    state: present
+    name: "{{ banner_user }}"
+    group: "{{ banner_group }}"
+
+- name: Ensure .ssh directory exists.
+  file:
+    dest: "/home/{{banner_user}}/.ssh"
+    mode: 0700
+    owner: "{{ banner_user }}"
+    state: directory
+
+- name: Install ssh key
+  copy:
+    src: "{{ banner_key_file_folder }}/{{ banner_key_file }}"
+    dest: "/home/{{banner_user}}/.ssh/{{ banner_key_file }}"
+    mode: 0600
+    owner: "{{ banner_user }}"
+
+- name: Create Base Folder
+  become: yes
+  file:
+    path: "{{ banner_base_dir }}"
+    state: directory
+    owner: "{{ banner_user }}"
+    group: "{{ banner_group }}"
+
+- name: Create Banner Home Folder
+  become: yes
+  file:
+    path: "{{ banner_home }}"
+    state: directory
+    owner: "{{ banner_user }}"
+    group: "{{ banner_group }}"
+
+- name: Add Jobsub user
+  become: yes
+  user:
+    append: yes
+    state: present
+    name: "{{ banner_jobsub_user }}"
+    group: "{{ banner_group }}"
+    home: "{{ banner_jobsub_home }}"
+
+- name: Change Jobsub Directory so that it is Group Accessible
+  become: yes
+  file:
+    path: "{{ banner_jobsub_home }}"
+    state: directory
+    owner: "{{ banner_jobsub_user }}"
+    group: "{{ banner_group }}"
+    mode: 0770
+
+- name: Make Sure Users exists in banner group
+  become: yes
+  user:
+   append: yes
+   state: present
+   name: "{{ item }}"
+   groups: "{{ banner_group }}"
+  with_items: "{{ banner_users }}"
+
+- name: Put Banner Environmental Variables
+  become: yes
+  template:
+    src: "banner-ansible.sh.j2"
+    dest: /etc/profile.d/banner-ansible.sh
+    owner: root
+    group: root
+    mode: 0644
+  tags: environmental_variables
+
+- name: Download Banner Archive From Git
+  become: yes
+  become_user: "{{ banner_user }}"
+  git:
+    repo: "{{ banner_repo }}"
+    version: "{{ banner_repo_branch }}"
+    dest: "{{ banner_home }}"
+    update: yes
+    key_file: "{{ banner_banner_user_home }}/.ssh/{{ banner_key_file }}"
+    accept_hostkey: yes
+
+- name: Create Banner Links
+  become: yes
+  become_user: "{{ banner_user }}"
+  file:
+    path: "{{ banner_home }}/links"
+    state: directory
+    owner: "{{ banner_user }}"
+    group: "{{ banner_group }}"
+    mode: 0770

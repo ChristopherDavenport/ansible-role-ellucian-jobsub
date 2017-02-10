@@ -1,0 +1,19 @@
+---
+
+# banner_repo:
+# banner_repo_branch:
+
+# This is for creating appropriate files on the Jobsub Server
+banner_base_dir: /u02
+banner_root: /u02/ellucian/banner
+banner_home: "{{ banner_root }}"
+banner_links: "{{ banner_home }}/links"
+banner_admin: "{{ banner_home }}/admin"
+banner_exe_home: "{{ banner_home }}/general/exe"
+
+# These Are The Users For Controlling Processes
+banner_user: banner
+banner_group: banner_group
+banner_jobsub_user: jobsub
+banner_jobsub_home: /home/{{ banner_jobsub_user }}
+banner_banner_user_home: /home/{{banner_user}}

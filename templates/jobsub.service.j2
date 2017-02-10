@@ -1,0 +1,22 @@
+[Unit]
+Description=Ellucian Banner Jobsub
+After=network.target
+
+[Service]
+Type=forking
+User={{ banner_jobsub_user }}
+WorkingDirectory={{ banner_jobsub_home }}
+
+Environment=JOBSUB_USER={{ banner_jobsub_app_user }}
+Environment=JOBSUB_PASS={{ banner_jobsub_app_pass }}
+Environment=JOBSUB_LOG={{ banner_jobsub_app_log }}
+Environment=ORACLE_SID={{ oracle_client_databases }}
+Environment=ORACLE_BASE={{ oracle_client_oracle_base }}
+Environment=ORACLE_HOME{{ oracle_client_oracle_home }}
+
+ExecStart=
+ExecStop=
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

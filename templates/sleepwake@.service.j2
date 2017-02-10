@@ -1,0 +1,15 @@
+[Unit]
+Description=Ellucian Banner SleepWake - %I
+After=network.target
+
+[Service]
+Type=forking
+User={{ banner_jobsub_user }}
+WorkingDirectory={{ banner_jobsub_home }}/logs
+Environment=ECKERD_HOME={{ eckerd_banner_root }}
+ExecStart={{ eckerd_banner_root }}/util/bash/sleepwake.sh start %i
+ExecStop={{ eckerd_banner_root }}/util/bash/sleepwake.sh stop %i
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

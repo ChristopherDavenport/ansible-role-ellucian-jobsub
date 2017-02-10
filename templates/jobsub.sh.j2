@@ -1,0 +1,132 @@
+#!/bin/bash
+
+# This Script Sets Up The Environment For Running Jobsub/gurjobs
+# We Bring In Specific Variables
+#
+# If all the required variables are present it continues with those values,
+# if utilizing this approach write capacity to the log is necessary so
+# make sure that is in place
+#
+# If those variables are not set then based on a default parameter set
+# that was the old default it generates the necessary variables.
+#
+# As the logFolder isn't guaranteed, we want to ensure it's creation
+# JOBSUB_HOME must exist and must be the JOBSUB_USERS home folder
+# so that is a non-optional precursor but the log folder may need to
+# be created.
+function setEnvironmentalVariables(){
+
+{% if ellucian_jobsub_custom_enviroment_shl is defined and ellucian_jobsub_custom_enviroment_shl not in (None, "")  %}
+  source {{ ellucian_jobsub_custom_enviroment_shl }}
+{% endif %}
+
+  # If All Variables Are Set No Need To Grab Defaults
+  if [ -n "$JOBSUB_USER" ] && [ -n "$JOBSUB_PASS" ] &&
+  [ -n "$JOBSUB_LOG" ]; then
+    true
+  elif [  -n "$DFLT_GENLPRD_PASS" ] && [ -n "$JOBSUB_HOME" ] &&
+  [ -d "$JOBSUB_HOME" ]; then
+
+    local logFolder="${JOBSUB_HOME}/logs"
+
+    if [ ! -d "$logFolder" ]; then
+      mkdir "$logFolder"
+    fi
+
+    JOBSUB_USER=genlprd
+    JOBSUB_PASS="$DFLT_GENLPRD_PASS"
+    JOBSUB_LOG="$logFolder/jobsub.log"
+
+  else
+    environment_error
+  fi
+}
+
+# Runs gurjobs as primary forked process
+# We have removed gurjobs.shl as it made an unnecessary temporary file
+# and was detected as the Primary Process,
+# since we have no pidfiles our forks need to be obvious.
+function start(){
+
+( echo "$JOBSUB_USER";
+  echo "$JOBSUB_PASS"; ) | nohup {{ banner_links }}/gurjobs -o jobs1 >> "$JOBSUB_LOG" 2>&1 &
+
+}
+
+# Checks if gurjobs is running. If it is then it sends a gurstop over the pipe
+# This stops processing by initiatializing the shutdown over the pipe, which
+# means that all stopping mechanisms will only run if gurjobs is up
+#
+# One caveat is if for some reason multiple jobsubs were interacting with
+# the same database then stoppage may not behave as expected.
+function stop(){
+  if pgrep gurjobs > /dev/null
+  then
+    {{ oracle_client_oracle_home }}/bin/sqlplus "$JOBSUB_USER"/"$JOBSUB_PASS" @gurstop
+  fi
+}
+
+function log(){
+    local message="${1}"
+    echo "$message"
+    echo "$message" >> "$JOBSUB_LOG" 2>&1
+}
+
+function actionlog(){
+  local action="$1"
+  log ""
+  log "Job Submission: $action for database $ORACLE_SID"
+  log "Job Submission: $(date)"
+  log "Job Submission: $0"
+  log "Job Submission: ORACLE_BASE= $ORACLE_BASE"
+  log "Job Submission: ORACLE_HOME= $ORACLE_HOME"
+  log "Job Submission: JOBSUB_USER= $JOBSUB_USER"
+  log ""
+}
+
+function environment_error(){
+  echo "Environmental Variables not Set Correctly"
+  echo "Check either full set;"
+  echo "JOBSUB_DB_USER, JOBSUB_DB_PASS, JOBSUB_USER, JOBSUB_LOG"
+  echo "or default inferred set"
+  echo "JOBSUB_HOME, DFLT_GENLPRD_PASS"
+  exit 1
+}
+
+function syntax_error(){
+  log ""
+  log "Job Submission: syntax error"
+  log "Job Submission: $(date)"
+  log "Job Submission: $0"
+  log ""
+  log "Syntax: jobsub.sh [start | stop | restart]"
+  log ""
+  exit 1
+}
+
+function runCommand(){
+  local commandAction="$1"
+  case "$commandAction" in
+    'start')
+      actionlog "starting"
+      start
+      ;;
+    'stop')
+      actionlog "stopping"
+      stop
+      ;;
+    'restart')
+      actionlog "restarting"
+      stop
+      sleep 10
+      start
+      ;;
+    *)
+      syntax_error
+      ;;
+  esac
+}
+
+setEnvironmentalVariables
+runCommand "$1"
+exit 0

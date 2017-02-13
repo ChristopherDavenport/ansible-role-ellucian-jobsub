@@ -1,7 +1,7 @@
 ---
 
-# banner_repo:
-# banner_repo_branch:
+# banner_jobsub_repo:
+# banner_jobsub_repo_branch:
 
 # This is for creating appropriate files on the Jobsub Server
 banner_base_dir: /u02

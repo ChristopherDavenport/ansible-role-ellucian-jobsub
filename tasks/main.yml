@@ -85,8 +85,8 @@
   become: yes
   become_user: "{{ banner_user }}"
   git:
-    repo: "{{ banner_repo }}"
-    version: "{{ banner_repo_branch }}"
+    repo: "{{ banner_jobsub_repo }}"
+    version: "{{ banner_jobsub_repo_branch }}"
     dest: "{{ banner_home }}"
     update: yes
     key_file: "{{ banner_banner_user_home }}/.ssh/{{ banner_key_file }}"

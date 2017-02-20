@@ -3,6 +3,7 @@
 BANNER_ROOT={{ banner_root }}
 BANNER_HOME={{ banner_home }}
 EXE_HOME={{ banner_exe_home }}
+DATA_HOME={{ banner_data_home }}
 
 BANNER_LINKS={{ banner_links }}
 BANNER_ADMIN={{ banner_admin }}
@@ -13,6 +14,7 @@ ORACLE_LPPROG="lpr"
 ORACLE_LPARGS="-Plp"
 ORACLE_PATH=.:${HOME}:${BANNER_LINKS}:${BANNER_ADMIN}
 SQLPATH=${ORACLE_PATH}
+
 
 case $PATH in
      *${EXE_HOME}*) ;;
@@ -64,6 +66,8 @@ esac
 export BANNER_ROOT
 export BANNER_HOME
 export EXE_HOME
+export DATA_HOME
+
 export BANNER_LINKS
 export BANNER_ADMIN
 export JOBSUB_HOME

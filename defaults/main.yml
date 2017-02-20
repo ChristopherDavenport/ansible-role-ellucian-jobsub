@@ -5,11 +5,16 @@
 
 # This is for creating appropriate files on the Jobsub Server
 banner_base_dir: /u02
-banner_root: /u02/ellucian/banner
+banner_ellucian_root: "{{banner_base_dir}}/ellucian"
+banner_root: "{{ banner_ellucian_root}}/banner"
 banner_home: "{{ banner_root }}"
 banner_links: "{{ banner_home }}/links"
 banner_admin: "{{ banner_home }}/admin"
 banner_exe_home: "{{ banner_home }}/general/exe"
+
+banner_data_home: "{{banner_ellucian_root}}/data"
+
+banner_staging: "{{banner_ellucian_root}}/staging"
 
 # These Are The Users For Controlling Processes
 banner_user: banner
@@ -17,3 +22,5 @@ banner_group: banner_group
 banner_jobsub_user: jobsub
 banner_jobsub_home: /home/{{ banner_jobsub_user }}
 banner_banner_user_home: /home/{{banner_user}}
+
+banner_environment_file: banner.sh

@@ -7,7 +7,6 @@ I have inventory groups for gnucobol-jobsub and netcobol-jobsub which are both c
 of jobsub.
 
 
-
 ```yml
 
 - hosts: jobsub
